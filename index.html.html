@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PowerFin — Tus finanzas, sin excusas.</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f5f4f0; color: #1a1a1a; }
+
+    /* HERO */
+    .pf-hero { background: #0a1628; color: #fff; padding: 80px 40px 70px; text-align: center; position: relative; overflow: hidden; }
+    .pf-hero::before { content: ''; position: absolute; top: -80px; left: -80px; width: 400px; height: 400px; border-radius: 50%; background: rgba(29,158,117,0.12); }
+    .pf-hero::after { content: ''; position: absolute; bottom: -60px; right: -60px; width: 300px; height: 300px; border-radius: 50%; background: rgba(55,138,221,0.1); }
+    .pf-tag { display: inline-block; background: rgba(29,158,117,0.2); color: #1D9E75; border: 1px solid rgba(29,158,117,0.3); border-radius: 20px; padding: 4px 14px; font-size: 12px; font-weight: 500; letter-spacing: 0.05em; margin-bottom: 20px; position: relative; z-index: 1; }
+    .pf-hero h1 { font-family: 'DM Serif Display', serif; font-size: 56px; font-weight: 400; line-height: 1.1; color: #fff; margin: 0 0 16px; position: relative; z-index: 1; }
+    .pf-hero h1 em { font-style: italic; color: #1D9E75; }
+    .pf-hero p { font-size: 18px; color: rgba(255,255,255,0.65); max-width: 540px; margin: 0 auto 32px; line-height: 1.6; position: relative; z-index: 1; }
+    .pf-cta { display: inline-block; background: #1D9E75; color: #fff; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: 500; text-decoration: none; position: relative; z-index: 1; font-family: 'DM Sans', sans-serif; }
+    .pf-cta-sub { display: block; font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 14px; position: relative; z-index: 1; }
+
+    /* DASHBOARD */
+    .pf-dashboard { background: #0f1e35; padding: 32px 40px; }
+    .pf-dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .pf-dash-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: #fff; }
+    .pf-dash-period { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); padding: 6px 14px; border-radius: 6px; font-size: 12px; }
+
+    .pf-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+    .pf-kpi { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px 18px; }
+    .pf-kpi-label { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .pf-kpi-val { font-size: 24px; font-weight: 500; }
+    .pf-kpi-val.green { color: #1D9E75; }
+    .pf-kpi-val.amber { color: #EF9F27; }
+    .pf-kpi-val.red { color: #E24B4A; }
+    .pf-kpi-sub { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 4px; }
+
+    .pf-mid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .pf-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 20px; }
+    .pf-card-title { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+
+    .pf-alerts { display: flex; flex-direction: column; gap: 8px; }
+    .pf-alert { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 8px; }
+    .pf-alert.green { background: rgba(29,158,117,0.12); border: 1px solid rgba(29,158,117,0.2); }
+    .pf-alert.amber { background: rgba(239,159,39,0.12); border: 1px solid rgba(239,159,39,0.2); }
+    .pf-alert.red { background: rgba(226,75,74,0.12); border: 1px solid rgba(226,75,74,0.2); }
+    .pf-alert-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+    .green .pf-alert-dot { background: #1D9E75; }
+    .amber .pf-alert-dot { background: #EF9F27; }
+    .red .pf-alert-dot { background: #E24B4A; }
+    .pf-alert-text { font-size: 12px; line-height: 1.45; }
+    .pf-alert.green .pf-alert-text { color: rgba(100,220,170,0.9); }
+    .pf-alert.amber .pf-alert-text { color: rgba(239,180,80,0.9); }
+    .pf-alert.red .pf-alert-text { color: rgba(240,110,100,0.9); }
+    .pf-alert-label { font-weight: 500; font-size: 11px; display: block; margin-bottom: 2px; opacity: 0.7; }
+
+    .pf-bar-rows { display: flex; flex-direction: column; gap: 12px; }
+    .pf-bar-row { display: flex; flex-direction: column; gap: 5px; }
+    .pf-bar-top { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.45); }
+    .pf-bar-track { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+    .pf-bar-fill { height: 100%; border-radius: 3px; }
+
+    .pf-bottom { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 0; }
+    .pf-patrimonio { display: flex; flex-direction: column; gap: 4px; }
+    .pf-pat-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; }
+    .pf-pat-row:last-child { border-bottom: none; }
+    .pf-pat-label { color: rgba(255,255,255,0.45); }
+    .pf-pat-val { color: #fff; font-weight: 500; }
+    .pf-pat-val.pos { color: #1D9E75; }
+
+    .pf-proj { display: flex; flex-direction: column; gap: 14px; }
+    .pf-proj-bar { display: flex; flex-direction: column; gap: 5px; }
+    .pf-proj-label { display: flex; justify-content: space-between; font-size: 11px; color: rgba(255,255,255,0.4); }
+    .pf-proj-track { height: 10px; background: rgba(255,255,255,0.06); border-radius: 5px; overflow: hidden; }
+    .pf-proj-fill { height: 100%; border-radius: 5px; }
+
+    /* FEATURES */
+    .pf-features { padding: 72px 40px; background: #fff; }
+    .pf-feat-header { text-align: center; margin-bottom: 52px; }
+    .pf-feat-header h2 { font-family: 'DM Serif Display', serif; font-size: 38px; font-weight: 400; margin: 0 0 14px; color: #0a1628; }
+    .pf-feat-header p { color: #666; font-size: 16px; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+    .pf-feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 960px; margin: 0 auto; }
+    .pf-feat-card { background: #f8f8f6; border-radius: 12px; padding: 28px 24px; border: 1px solid #eae9e4; }
+    .pf-feat-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+    .pf-feat-card h3 { font-size: 15px; font-weight: 500; margin: 0 0 8px; color: #0a1628; }
+    .pf-feat-card p { font-size: 13px; color: #777; line-height: 1.65; }
+
+    /* SOCIAL CTA */
+    .pf-social { padding: 64px 40px; background: #f5f4f0; text-align: center; }
+    .pf-social h2 { font-family: 'DM Serif Display', serif; font-size: 34px; font-weight: 400; margin: 0 0 10px; color: #0a1628; }
+    .pf-social > p { color: #888; margin: 0 0 32px; font-size: 15px; }
+    .pf-comment-box { display: inline-block; background: #0a1628; color: rgba(255,255,255,0.8); padding: 18px 32px; border-radius: 12px; font-size: 16px; margin-bottom: 14px; }
+    .pf-comment-box span { color: #1D9E75; font-weight: 500; }
+    .pf-comment-sub { font-size: 13px; color: #aaa; }
+
+    /* FOOTER */
+    .pf-footer { background: #0a1628; padding: 32px 40px; display: flex; justify-content: space-between; align-items: center; }
+    .pf-footer-logo { font-family: 'DM Serif Display', serif; font-size: 24px; color: #fff; }
+    .pf-footer-logo span { color: #1D9E75; }
+    .pf-footer-tagline { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 5px; }
+    .pf-footer-right { font-size: 12px; color: rgba(255,255,255,0.25); }
+
+    @media (max-width: 768px) {
+      .pf-hero h1 { font-size: 36px; }
+      .pf-kpis { grid-template-columns: repeat(2, 1fr); }
+      .pf-mid { grid-template-columns: 1fr; }
+      .pf-bottom { grid-template-columns: 1fr; }
+      .pf-feat-grid { grid-template-columns: 1fr; }
+      .pf-dashboard { padding: 24px 20px; }
+      .pf-features, .pf-social { padding: 48px 24px; }
+      .pf-footer { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="pf-hero">
+    <div class="pf-tag">PREVIEW · ACCESO ANTICIPADO</div>
+    <h1>Tus finanzas,<br><em>sin excusas.</em></h1>
+    <p>PowerFin te dice exactamente a dónde va tu plata — con alertas automáticas, proyecciones a largo plazo y control de inversiones. Todo en Google Sheets.</p>
+    <a href="#" class="pf-cta">Comentá POWERFIN y te mando el acceso</a>
+    <span class="pf-cta-sub">Funciona en cualquier país · Cualquier moneda · Sin instalar nada</span>
+  </section>
+
+  <!-- DASHBOARD DEMO -->
+  <section class="pf-dashboard">
+    <div class="pf-dash-header">
+      <div class="pf-dash-title">Dashboard Financiero</div>
+      <div class="pf-dash-period">Febrero 2026</div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="pf-kpis">
+      <div class="pf-kpi">
+        <div class="pf-kpi-label">Ingresos</div>
+        <div class="pf-kpi-val green">$941k</div>
+        <div class="pf-kpi-sub">+4.2% vs enero</div>
+      </div>
+      <div class="pf-kpi">
+        <div class="pf-kpi-label">Gasto total</div>
+        <div class="pf-kpi-val amber">$724k</div>
+        <div class="pf-kpi-sub">76.9% del ingreso</div>
+      </div>
+      <div class="pf-kpi">
+        <div class="pf-kpi-label">Tasa de ahorro</div>
+        <div class="pf-kpi-val green">23.1%</div>
+        <div class="pf-kpi-sub">Meta: 10%</div>
+      </div>
+      <div class="pf-kpi">
+        <div class="pf-kpi-label">Fondo emergencia</div>
+        <div class="pf-kpi-val green">$5.53M</div>
+        <div class="pf-kpi-sub">6× salario promedio</div>
+      </div>
+    </div>
+
+    <!-- ALERTAS + CATEGORÍAS -->
+    <div class="pf-mid">
+      <div class="pf-card">
+        <div class="pf-card-title">Alertas semáforo</div>
+        <div class="pf-alerts">
+          <div class="pf-alert green">
+            <div class="pf-alert-dot"></div>
+            <div class="pf-alert-text">
+              <span class="pf-alert-label">Resultado del mes</span>
+              Cerraste febrero en positivo. Tu disciplina está dando frutos — seguí así.
+            </div>
+          </div>
+          <div class="pf-alert amber">
+            <div class="pf-alert-dot"></div>
+            <div class="pf-alert-text">
+              <span class="pf-alert-label">Gasto hormiga</span>
+              $68k en café y salidas. Estás al límite — un café menos por semana te ahorra $8k/mes.
+            </div>
+          </div>
+          <div class="pf-alert red">
+            <div class="pf-alert-dot"></div>
+            <div class="pf-alert-text">
+              <span class="pf-alert-label">Impuestos USD</span>
+              Superaste $200k. Revisá si podés diferir algún pago al mes próximo.
+            </div>
+          </div>
+          <div class="pf-alert green">
+            <div class="pf-alert-dot"></div>
+            <div class="pf-alert-text">
+              <span class="pf-alert-label">Tasa de ahorro</span>
+              23.1% — más del doble de la meta. Excelente mes.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pf-card">
+        <div class="pf-card-title">Gastos por categoría</div>
+        <div class="pf-bar-rows">
+          <div class="pf-bar-row">
+            <div class="pf-bar-top"><span>Impuestos USD</span><span style="color:#E24B4A">$218k / $200k</span></div>
+            <div class="pf-bar-track"><div class="pf-bar-fill" style="width:100%;background:#E24B4A;"></div></div>
+          </div>
+          <div class="pf-bar-row">
+            <div class="pf-bar-top"><span>Personal / Varios</span><span style="color:#EF9F27">$84k / $90k</span></div>
+            <div class="pf-bar-track"><div class="pf-bar-fill" style="width:93%;background:#EF9F27;"></div></div>
+          </div>
+          <div class="pf-bar-row">
+            <div class="pf-bar-top"><span>Comida</span><span style="color:#1D9E75">$89k / $96k</span></div>
+            <div class="pf-bar-track"><div class="pf-bar-fill" style="width:78%;background:#1D9E75;"></div></div>
+          </div>
+          <div class="pf-bar-row">
+            <div class="pf-bar-top"><span>Herramientas</span><span style="color:#378ADD">$42k / $50k</span></div>
+            <div class="pf-bar-track"><div class="pf-bar-fill" style="width:65%;background:#378ADD;"></div></div>
+          </div>
+          <div class="pf-bar-row">
+            <div class="pf-bar-top"><span>Ocio / Entretenimiento</span><span style="color:#378ADD">$38k / $45k</span></div>
+            <div class="pf-bar-track"><div class="pf-bar-fill" style="width:58%;background:#378ADD;"></div></div>
+          </div>
+          <div class="pf-bar-row">
+            <div class="pf-bar-top"><span>Café</span><span style="color:#EF9F27">$57k / $48k</span></div>
+            <div class="pf-bar-track"><div class="pf-bar-fill" style="width:100%;background:#EF9F27;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PATRIMONIO + PROYECCIONES -->
+    <div class="pf-bottom">
+      <div class="pf-card">
+        <div class="pf-card-title">Patrimonio neto</div>
+        <div class="pf-patrimonio">
+          <div class="pf-pat-row">
+            <span class="pf-pat-label">Fondo emergencia</span>
+            <span class="pf-pat-val pos">$5.53M</span>
+          </div>
+          <div class="pf-pat-row">
+            <span class="pf-pat-label">Inversiones crypto</span>
+            <span class="pf-pat-val pos">$1.2M</span>
+          </div>
+          <div class="pf-pat-row">
+            <span class="pf-pat-label">Acciones</span>
+            <span class="pf-pat-val pos">$840k</span>
+          </div>
+          <div class="pf-pat-row">
+            <span class="pf-pat-label">Efectivo</span>
+            <span class="pf-pat-val">$320k</span>
+          </div>
+          <div class="pf-pat-row" style="border-top: 1px solid rgba(255,255,255,0.15); margin-top: 6px; padding-top: 12px;">
+            <span class="pf-pat-label" style="color:rgba(255,255,255,0.7); font-weight:500;">Total</span>
+            <span class="pf-pat-val pos" style="font-size:17px;">$7.89M</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pf-card">
+        <div class="pf-card-title">Proyección fondo de emergencia</div>
+        <div class="pf-proj">
+          <div class="pf-proj-bar">
+            <div class="pf-proj-label"><span>Actual</span><span>$5.53M</span></div>
+            <div class="pf-proj-track"><div class="pf-proj-fill" style="width:60%;background:#1D9E75;"></div></div>
+          </div>
+          <div class="pf-proj-bar">
+            <div class="pf-proj-label"><span>En 6 meses</span><span>$6.8M</span></div>
+            <div class="pf-proj-track"><div class="pf-proj-fill" style="width:73%;background:#378ADD;"></div></div>
+          </div>
+          <div class="pf-proj-bar">
+            <div class="pf-proj-label"><span>En 12 meses</span><span>$8.2M</span></div>
+            <div class="pf-proj-track"><div class="pf-proj-fill" style="width:88%;background:#534AB7;"></div></div>
+          </div>
+          <div class="pf-proj-bar">
+            <div class="pf-proj-label"><span>Meta (×12 salario)</span><span>$11.3M</span></div>
+            <div class="pf-proj-track"><div class="pf-proj-fill" style="width:49%;background:rgba(255,255,255,0.12);"></div></div>
+          </div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.28);margin-top:4px;">A ritmo actual alcanzás la meta en 28 meses</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="pf-features">
+    <div class="pf-feat-header">
+      <h2>Todo lo que necesitás para tomar control</h2>
+      <p>Sin apps nuevas, sin suscripciones adicionales. Funciona en Google Sheets desde el día 1.</p>
+    </div>
+    <div class="pf-feat-grid">
+      <div class="pf-feat-card">
+        <span class="pf-feat-icon">📥</span>
+        <h3>Importación automática</h3>
+        <p>Tus gastos se cargan solos. Sin tipear, sin planillas manuales, sin olvidarte nada.</p>
+      </div>
+      <div class="pf-feat-card">
+        <span class="pf-feat-icon">🚦</span>
+        <h3>Alertas semáforo inteligentes</h3>
+        <p>Verde, amarillo o rojo según tus números reales — con mensajes que te explican qué hacer.</p>
+      </div>
+      <div class="pf-feat-card">
+        <span class="pf-feat-icon">📈</span>
+        <h3>Proyecciones a largo plazo</h3>
+        <p>Sabés hoy adónde vas a llegar si seguís como estás. Mes a mes, año a año.</p>
+      </div>
+      <div class="pf-feat-card">
+        <span class="pf-feat-icon">💹</span>
+        <h3>Control de inversiones</h3>
+        <p>Acciones, cripto o cualquier activo — todo en un solo lugar junto con tu plata del día a día.</p>
+      </div>
+      <div class="pf-feat-card">
+        <span class="pf-feat-icon">🥧</span>
+        <h3>Gráficos visuales</h3>
+        <p>Torta y barras que muestran tu distribución de gastos de un vistazo. Sin tablas complicadas.</p>
+      </div>
+      <div class="pf-feat-card">
+        <span class="pf-feat-icon">🌍</span>
+        <h3>Cualquier moneda, cualquier país</h3>
+        <p>Funciona en Argentina, México, España — donde estés. En tu moneda local.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="pf-social">
+    <h2>¿Querés acceso anticipado?</h2>
+    <p>Dejá tu comentario y te mando el link directo</p>
+    <div class="pf-comment-box">Comentá <span>POWERFIN</span> y te mando el acceso</div>
+    <br>
+    <div class="pf-comment-sub">Validación orgánica · Sin costo por ahora · Cupos limitados</div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="pf-footer">
+    <div>
+      <div class="pf-footer-logo">Power<span>Fin</span></div>
+      <div class="pf-footer-tagline">Tu sistema de finanzas personales en Google Sheets</div>
+    </div>
+    <div class="pf-footer-right">© 2026 PowerFin</div>
+  </footer>
+
+</body>
+</html>
